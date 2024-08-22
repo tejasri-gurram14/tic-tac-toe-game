@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        #board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2em;
+            border: 1px solid #000;
+            cursor: pointer;
+        }
+        .cell.taken {
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div id="board">
+        <div class="cell" data-index="0"></div>
+        <div class="cell" data-index="1"></div>
+        <div class="cell" data-index="2"></div>
+        <div class="cell" data-index="3"></div>
+        <div class="cell" data-index="4"></div>
+        <div class="cell" data-index="5"></div>
+        <div class="cell" data-index="6"></div>
+        <div class="cell" data-index="7"></div>
+        <div class="cell" data-index="8"></div>
+    </div>
+
+    <script>
+
+const boardElement = document.getElementById('board');
+const cells = Array.from(document.getElementsByClassName('cell'));
+let board = ['', '', '', '', '', '', '', '', ''];
+let currentPlayer = 'X';
+const winningCombinations = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6]
+];
+
+function handleClick(event) {
+    const index = event.target.getAttribute('data-index');
+    if (board[index] !== '' || checkWinner(board) || isBoardFull(board)) return;
+
+    board[index] = currentPlayer;
+    event.target.innerText = currentPlayer;
+    event.target.classList.add('taken');
+
+    if (checkWinner(board)) {
+        alert(Player ${currentPlayer} wins!);
+        return;
+    } else if (isBoardFull(board)) {
+        alert("It's a draw!");
+        return;
+    }
+
+    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+    if (currentPlayer === 'O') {
+        computerMove();
+    }
+}
+
+function computerMove() {
+    let availableIndexes = board.map((val, index) => val === '' ? index : null).filter(val => val !== null);
+    let move = availableIndexes[Math.floor(Math.random() * availableIndexes.length)];
+    board[move] = currentPlayer;
+    cells[move].innerText = currentPlayer;
+    cells[move].classList.add('taken');
+
+    if (checkWinner(board)) {
+        alert(Player ${currentPlayer} wins!);
+        return;
+    } else if (isBoardFull(board)) {
+        alert("It's a draw!");
+        return;
+    }
+
+    currentPlayer = 'X';
+}
+
+function checkWinner(board) {
+    for (let combo of winningCombinations) {
+        const [a, b, c] = combo;
+        if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function isBoardFull(board) {
+    return board.every(cell => cell !== '');
+}
+
+cells.forEach(cell => cell.addEventListener('click', handleClick));
+</script>
+</body>
+</html>
